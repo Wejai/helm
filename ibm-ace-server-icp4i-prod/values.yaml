@@ -12,24 +12,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+#GOWTHAM
 # license must be set to "accept" in order to accept the terms of the IBM license
-license: "not accepted"
+license: "accept"
 
 # The URL to pull content from before initialising the Integration Server
 # Of the form https://releasename/path/to/dir?token
-contentServerURL:
+#GOWTHAM provided the content URL
+contentServerURL: https://ace-dboard-admin-ibm-ace-dashboard-icp4i-prod:3443/v1/directories/SampleApp?9cb907df-de30-4013-9954-6999405ec61c
 
+#GOWTHAM Changed production usage to false
 # Whether the application is running production workloads
-productionDeployment: true
+productionDeployment: false
 
-# The image type to run
-imageType: ace
+#GOWTHAM
+# The image type to run ace, acemqclient or acemqserver.
+imageType: acemqserver
 
 arch: amd64
 
 # Whether to start an image with a designer flows sidecar container enabled
 designerFlowsEnabled: false
 
+#GOWTHAM Changes pull-secret
 image:
   aceonly: cp.icr.io/ibm-ace-server-prod:11.0.0.6
   acemqclient: cp.icr.io/ibm-ace-mqclient-server-prod:11.0.0.6
@@ -37,7 +42,7 @@ image:
   configurator: cp.icr.io/ibm-ace-icp-configurator-prod:11.0.0.6
   designerflows: cp.icr.io/ibm-ace-designer-flows-prod:11.0.0.6
   pullPolicy: IfNotPresent
-  pullSecret:
+  pullSecret: entitled-mypullsecret
 
 service:
   type: NodePort
@@ -49,8 +54,9 @@ service:
   # Port used by the switch for agentP calls, normally 9011
   switchAgentPPort: 
   # Port used by the switch for admin calls, normally 9012
+  #GOWTHAM provided the icp-proxy FQDN
   switchAdminPort: 
-  iP: 
+  iP: icp-proxy.apps.bcph2-bcph2-1.fyre.ibm.com
   # Use the following section to add custom ports to the service. 
   # ref: https://kubernetes.io/docs/concepts/services-networking/service/
   customPorts: 
@@ -71,7 +77,8 @@ integrationServer:
   # defaultAppName allows you to specifiy a name for the default application for the deployment of independent resources
   defaultAppName:
   # The secret containing server configuration
-  configurationSecret:
+  #GOWTHAM added the ace-file-demo-secrets by running generatesecrets.sh in config.tar.gz
+  configurationSecret: 
   # gid for the secondary group the containers should run in so that they can access NFS storage.
   fsGroupGid:
 
@@ -88,8 +95,9 @@ aceonly:
     limits:
       cpu: "1"
       memory: 1024Mi
+  #GOWTHAM Changed the replica count to 1    
   # The number of pod replicas to have - note that this is only used if the MQ queue manager is NOT enabled.
-  replicaCount: 3
+  replicaCount: 1
 
 ###########################################################
 # ibm-ace-mq-server-prod (ACE w/ MQ) specific settings
@@ -136,8 +144,10 @@ designerflows:
 # persistence section specifies persistence settings which apply to the whole chart
 persistence:
   # enabled is whether to use Persistent Volumes or not
+  #GOWTHAM changed to true
   enabled: true
   # useDynamicProvisioning is whether or not to use Storage Classes to dynamically create Persistent Volumes
+  #GOWTHAM changed to true
   useDynamicProvisioning: true
 
 # dataPVC section specifies settings for the main Persistent Volume Claim, which is used for data in /var/mqm
@@ -145,7 +155,7 @@ dataPVC:
   # name sets part of the name for this Persistent Volume Claim
   name: "data"
   ## storageClassName is the name of the Storage Class to use, or an empty string for no Storage Class
-  storageClassName: ""
+  storageClassName: "ibmc-block-silver"
   ## size is the minimum size of the Persistent Volume
   size: 2Gi
 
@@ -154,6 +164,7 @@ log:
   format: json
 
 # metrics section specifies settings for generating queue manager and Integration Server metrics
+#GOWTHAM changed to true
 metrics:
   enabled: true
 
@@ -176,6 +187,7 @@ readinessProbe:
 dashboardEnabled: true
 
 # Operations dashboard configuration
+#GOWTHAM changed to false as it is not supported by Operation Dashboard
 odTracingConfig:
   enabled: false
 
@@ -206,5 +218,6 @@ odTracingConfig:
     failureThreshold: 3
 
   # odTracingNamespace used to generate the odTracingRegistrationHostname and odTracingDataHostname as icp4i-od.<namespace>.svc and od-store-od.<namespace>.svc
-  odTracingNamespace:
+  #GOWTHAM set to tracing
+  odTracingNamespace: 
   
